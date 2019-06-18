@@ -16,19 +16,23 @@ function init() {
 	
 	// Load custom model
 	var loader = new THREE.GLTFLoader();
-
-	loader.load('model/scene.gltf', function (gltf) {
-		gltf.scene.position.x = 1;
-		
+	loader.load('house/scene.gltf', function (gltf) {
+		gltf.scene.position.x = 0;
 		scene.add(gltf.scene);
-		return mesh2 = gltf.scene
+
+		gltf.animations; // Array<THREE.AnimationClip>
+		gltf.scene; // THREE.Scene
+		gltf.scenes; // Array<THREE.Scene>
+		gltf.cameras; // Array<THREE.Camera>
+		gltf.asset; // Object
+		debugger
+		// return mesh2 = gltf.scene
 	}, undefined, function (error) {
-
 		console.error(error);
-
 	});
+
 	
-	var light = new THREE.AmbientLight(0x404040, 5); // soft white light
+	var light = new THREE.AmbientLight(0x404040, 10); // soft white light
 	scene.add(light);
 
 	renderer = new THREE.WebGLRenderer({ antialias: true });
