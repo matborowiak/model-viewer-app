@@ -82,7 +82,16 @@ function initSky() {
 function init() {
     // Scene Setup
     scene = new THREE.Scene()
-    scene.background = new THREE.Color(0xddddddd)
+	// scene.background = new THREE.Color(0xddddddd)
+	scene.background = new THREE.CubeTextureLoader()
+	.load( [
+		'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/posx.jpg',
+		'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/negx.jpg',
+		'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/posy.jpg',
+		'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/negy.jpg',
+		'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/posz.jpg',
+		'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/negz.jpg'
+	] );
 
     // Set Ground Plane Geometry
     const geometry = new THREE.PlaneGeometry(15, 15, 15)
@@ -92,7 +101,8 @@ function init() {
     })
     const groundPlane = new THREE.Mesh(geometry, material)
     groundPlane.rotation.set(Math.PI / 2, 0, 0)
-    groundPlane.castShadow = true
+	groundPlane.castShadow = true
+	groundPlane.receiveShadow = true
     scene.add(groundPlane)
 
     // Load custom GLTF model
@@ -101,9 +111,11 @@ function init() {
         '/model3/scene.gltf',
         function(gltf) {
             const model = gltf.scene.children[0]
-            model.scale.set(0.01, 0.01, 0.01)
-            model.rotation.set(1.5707963267948963, 0, -0.8)
-            model.castShadow = true
+			model.scale.set(0.01, 0.01, 0.01)
+			model.position.y = .4
+            model.rotation.set(1.5707963267948963, 0, Math.PI / -2)
+			model.castShadow = true
+			model.receiveShadow = true
             console.log(model)
             scene.add(model)
         },
@@ -115,10 +127,10 @@ function init() {
 
     // Camera Setup
     camera = new THREE.PerspectiveCamera(
-        70,
+        60,
         window.innerWidth / window.innerHeight,
         1,
-        1000
+        100000
     )
     camera.position.set(0, 2, 12)
     scene.add(camera)
@@ -129,7 +141,9 @@ function init() {
     scene.add(ambientLight)
 
     // Point Light
-    const pointLight = new THREE.DirectionalLight(0x1fffff, 20)
+	const pointLight = new THREE.DirectionalLight(0x1fffff, 20)
+	pointLight.castShadow = true
+	pointLight.shadowCameraVisible = true
     pointLight.position.set(15, 15, 1)
     pointLight.target.position.set(0, 0, 0)
     console.log(pointLight)
@@ -150,6 +164,6 @@ function init() {
     // Camera Controls
     const controls = new THREE.OrbitControls(camera, renderer.domElement)
 
-    // Use Sky
-    initSky()
+    // // Use Sky
+    // initSky()
 }
