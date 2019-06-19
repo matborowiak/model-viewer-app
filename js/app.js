@@ -1,5 +1,15 @@
 let camera, scene, renderer
 
+var gui, shadowCameraHelper, shadowConfig = {
+
+	shadowCameraVisible: false,
+	shadowCameraNear: 10,
+	shadowCameraFar: 70,
+	shadowCameraFov: 30,
+	shadowBias: - 0.01
+
+};
+
 init()
 animate()
 
@@ -123,13 +133,19 @@ function init() {
     loader.load(
         '/model3/scene.gltf',
         function(gltf) {
-            const model = gltf.scene.children[0]
+            const model = gltf.scene.children[0].children[0].children[0].children[0]
             model.scale.set(0.01, 0.01, 0.01)
             model.position.y = 0.4
             model.rotation.set(1.5707963267948963, 0, Math.PI / -2)
             model.castShadow = true
-            model.receiveShadow = true
-            console.log(model)
+			model.receiveShadow = true
+			const map = model.material.map
+			// Model Material Setup
+			model.material = new THREE.MeshPhongMaterial({
+				color: 0xcccccc,
+				side: THREE.DoubleSide,
+				map: map
+			})
             scene.add(model)
         },
         undefined,
@@ -150,25 +166,23 @@ function init() {
 
     // Light Setup
     // Ambient Light
-    const ambientLight = new THREE.AmbientLight(0xcccccc, 0.8)
+    const ambientLight = new THREE.AmbientLight(0xcccccc, 1.4)
     scene.add(ambientLight)
 
     // Point Light
-    const pointLight = new THREE.DirectionalLight(0xffffff, 1.5)
-    pointLight.position.set(-30, 20, -20)
+    const pointLight = new THREE.SpotLight(0xffffff, 1.5)
+    pointLight.position.set(-30, 40, -20)
     pointLight.target.position.set(0, 0, 0)
 	pointLight.castShadow = true
+	pointLight.shadow.bias = shadowConfig.shadowBias
 
-    pointLight.shadow.mapSize.width = 1000
-    pointLight.shadow.mapSize.height = 1000
+    pointLight.shadow.mapSize.width = 10000
+    pointLight.shadow.mapSize.height = 10000
 
    
-    pointLight.shadow.camera.near = 35
-    pointLight.shadow.camera.far = 50
-    pointLight.shadow.camera.left = -10
-    pointLight.shadow.camera.bottom = -10
-    pointLight.shadow.camera.right = 10
-    pointLight.shadow.camera.top = 10
+    pointLight.shadow.camera.near = shadowConfig.shadowCameraNear
+    pointLight.shadow.camera.far = shadowConfig.shadowCameraFar
+
     scene.add(pointLight)
 	console.log(pointLight)
 	
