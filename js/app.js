@@ -82,28 +82,41 @@ function initSky() {
 function init() {
     // Scene Setup
     scene = new THREE.Scene()
-	// scene.background = new THREE.Color(0xddddddd)
-	scene.background = new THREE.CubeTextureLoader()
-	.load( [
-		'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/posx.jpg',
-		'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/negx.jpg',
-		'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/posy.jpg',
-		'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/negy.jpg',
-		'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/posz.jpg',
-		'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/negz.jpg'
-	] );
+    // scene.background = new THREE.Color(0xddddddd)
+    scene.background = new THREE.CubeTextureLoader().load([
+        'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/posx.jpg',
+        'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/negx.jpg',
+        'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/posy.jpg',
+        'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/negy.jpg',
+        'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/posz.jpg',
+        'https://gltf-viewer.donmccurdy.com/assets/environment/Park2/negz.jpg'
+    ])
 
     // Set Ground Plane Geometry
     const geometry = new THREE.PlaneGeometry(15, 15, 15)
-    const material = new THREE.MeshBasicMaterial({
-        color: 0xcccccc,
+    const material = new THREE.MeshPhongMaterial({
+        color: 0x6c6c6c,
         side: THREE.DoubleSide
     })
     const groundPlane = new THREE.Mesh(geometry, material)
     groundPlane.rotation.set(Math.PI / 2, 0, 0)
-	groundPlane.castShadow = true
-	groundPlane.receiveShadow = true
+    groundPlane.castShadow = true
+    groundPlane.receiveShadow = true
     scene.add(groundPlane)
+
+    // Set Test Box
+    const geometry1 = new THREE.BoxGeometry(2, 2, 2)
+    const material1 = new THREE.MeshPhongMaterial({
+        color: 0xcccccc,
+        side: THREE.DoubleSide
+    })
+    const testBox = new THREE.Mesh(geometry1, material1)
+    testBox.rotation.set(Math.PI / 2, 0, 0)
+    testBox.position.set(-4, 1.5, 0)
+    testBox.castShadow = true
+    testBox.receiveShadow = true
+    console.log(testBox)
+    scene.add(testBox)
 
     // Load custom GLTF model
     const loader = new THREE.GLTFLoader()
@@ -111,11 +124,11 @@ function init() {
         '/model3/scene.gltf',
         function(gltf) {
             const model = gltf.scene.children[0]
-			model.scale.set(0.01, 0.01, 0.01)
-			model.position.y = .4
+            model.scale.set(0.01, 0.01, 0.01)
+            model.position.y = 0.4
             model.rotation.set(1.5707963267948963, 0, Math.PI / -2)
-			model.castShadow = true
-			model.receiveShadow = true
+            model.castShadow = true
+            model.receiveShadow = true
             console.log(model)
             scene.add(model)
         },
@@ -137,28 +150,38 @@ function init() {
 
     // Light Setup
     // Ambient Light
-    const ambientLight = new THREE.AmbientLight(0xcccccc, 1)
+    const ambientLight = new THREE.AmbientLight(0xcccccc, 0.8)
     scene.add(ambientLight)
 
     // Point Light
-	const pointLight = new THREE.DirectionalLight(0x1fffff, 20)
-	pointLight.castShadow = true
-	pointLight.shadowCameraVisible = true
-    pointLight.position.set(15, 15, 1)
+    const pointLight = new THREE.DirectionalLight(0xffffff, 1.5)
+    pointLight.position.set(-30, 20, -20)
     pointLight.target.position.set(0, 0, 0)
-    console.log(pointLight)
-    pointLight.position.set(0, 25, -25)
-    pointLight.shadow.camera.near = 0.5
-    pointLight.shadow.camera.far = 5000
-    pointLight.shadow.camera.left = -500
-    pointLight.shadow.camera.bottom = -500
-    pointLight.shadow.camera.right = 500
-    pointLight.shadow.camera.top = 500
+	pointLight.castShadow = true
+
+    pointLight.shadow.mapSize.width = 1000
+    pointLight.shadow.mapSize.height = 1000
+
+   
+    pointLight.shadow.camera.near = 35
+    pointLight.shadow.camera.far = 50
+    pointLight.shadow.camera.left = -10
+    pointLight.shadow.camera.bottom = -10
+    pointLight.shadow.camera.right = 10
+    pointLight.shadow.camera.top = 10
     scene.add(pointLight)
+	console.log(pointLight)
+	
+	// Shadow Cam Helper
+	const shadowCameraHelper = new THREE.CameraHelper(pointLight.shadow.camera);
+	shadowCameraHelper.visible = true;
+	scene.add(shadowCameraHelper)
 
     // Render Setup
     renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.shadowMap.enabled = true
+    renderer.shadowMapSoft = false
     document.body.appendChild(renderer.domElement)
 
     // Camera Controls
