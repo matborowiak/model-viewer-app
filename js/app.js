@@ -131,7 +131,7 @@ function init() {
     // Load custom GLTF model
     const loader = new THREE.GLTFLoader()
     loader.load(
-        '/model3/scene.gltf',
+        '/model/scene.gltf',
         function(gltf) {
             const model = gltf.scene.children[0].children[0].children[0].children[0]
             model.scale.set(0.01, 0.01, 0.01)
